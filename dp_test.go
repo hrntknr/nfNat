@@ -210,7 +210,6 @@ func TestDnat(t *testing.T) {
 	srv6.SegmentsLeft = 1
 	ipv4in.DstIP = net.IPv4(192, 168, 0, 3)
 	tcp.DstPort = 81
-	opts.ComputeChecksums = false
 	if err := gopacket.SerializeLayers(outbuf, opts, eth, ipv6, srv6, ipv4in, tcp, payload); err != nil {
 		t.Fatal(err)
 	}

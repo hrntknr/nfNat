@@ -28,7 +28,7 @@ struct sid_config_key
 
 struct sid_config_value
 {
-  __u8 flags;
+  __u8 dnat : 1, masquerade : 1;
 };
 
 struct dnat_rules_key
@@ -57,6 +57,43 @@ struct bpf_map_def SEC("maps") dnat_rules = {
     .max_entries = DNAT_RULE_SIZE,
 };
 
+__attribute__((__always_inline__)) static inline __u16 csum_fold_helper(__u64 csum)
+{
+  int i;
+#pragma unroll
+  for (i = 0; i < 4; i++)
+  {
+    if (csum >> 16)
+      csum = (csum & 0xffff) + (csum >> 16);
+  }
+  return ~csum;
+}
+
+__attribute__((__always_inline__)) static inline void update_l3_csum(__sum16 *csum, __be32 old_addr, __be32 new_addr)
+{
+  __u64 sum = *csum;
+  sum = ~sum;
+  sum = sum & 0xffff;
+  __u32 tmp;
+  tmp = ~old_addr;
+  sum += tmp;
+  sum += new_addr;
+  *csum = csum_fold_helper(sum);
+}
+
+__attribute__((__always_inline__)) static inline void update_l4_csum(__sum16 *csum, __be32 old_addr, __be16 old_port, __be32 new_addr, __be16 new_port)
+{
+  __u64 sum = *csum;
+  sum = ~sum;
+  sum = sum & 0xffff;
+  __u32 tmp;
+  tmp = ~(old_addr + old_port);
+  sum += tmp;
+  sum += new_port;
+  sum += new_addr;
+  *csum = csum_fold_helper(sum);
+}
+
 __attribute__((__always_inline__)) static inline int nat(struct xdp_md *ctx, void *nxt_ptr, struct in6_addr *segments)
 {
   void *data_end = (void *)(long)ctx->data_end;
@@ -72,7 +109,7 @@ __attribute__((__always_inline__)) static inline int nat(struct xdp_md *ctx, voi
   if (!config)
     return XDP_DROP;
 
-  if (config->flags & 0x01)
+  if (config->dnat)
   {
     // enable dnat
     struct dnat_rules_key key = {};
@@ -82,11 +119,13 @@ __attribute__((__always_inline__)) static inline int nat(struct xdp_md *ctx, voi
     rule = bpf_map_lookup_elem(&dnat_rules, &key);
     if (rule)
     {
+      update_l3_csum((void *)&ipv4->check, ipv4->daddr, rule->dst);
+      update_l4_csum((void *)&tcp->check, ipv4->daddr, tcp->dest, rule->dst, rule->dport);
       ipv4->daddr = rule->dst;
       tcp->dest = rule->dport;
     }
   }
-  if (config->flags & 0x02)
+  if (config->masquerade)
   {
     // enable masquerade
   }

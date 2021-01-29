@@ -1,0 +1,2 @@
+iface: eth0
+xdp_prog: ./dp/nfNat_dp.o

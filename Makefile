@@ -4,6 +4,7 @@ GO          = go
 GOOS        = linux
 GOARCH      = amd64
 GO111MODULE = on
+GOFLAGS     = -count=1
 GO_LDFLAGS  = -ldflags="-s -w"
 
 GO_BUILD    = $(GO) build
@@ -24,7 +25,7 @@ run:
 	./$(EXECUTABLES)
 
 test: build_dp
-	env GOOS=$(GOOS) $(GO_TEST) $(GO_PKGROOT)
+	env GOOS=$(GOOS) GOARCH=$(GOARCH) GOFLAGS=$(GOFLAGS) $(GO_TEST) $(GO_PKGROOT)
 
 clean:
 	rm -rf $(TARGETS)

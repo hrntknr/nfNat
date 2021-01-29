@@ -36,3 +36,4 @@ $(KERN_OBJ): %.o: %.c Makefile
 			-Wno-compare-distinct-pointer-types \
 			-O2 -emit-llvm -c -g $<
 	$(LLC) -march=bpf -filetype=obj -o $@ ${@:.o=.ll}
+	llvm-strip $@ --no-strip-all -R .BTF

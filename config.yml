@@ -1,2 +1,15 @@
 iface: enp5s0
 xdp_prog: ./dp/nfNat_dp.o
+sid:
+  2001:db8:0:1::/128:
+    dnat: true
+    masquerade: true
+dnat:
+  - dst: "203.0.113.1"
+    port: 22
+    to_dst: "10.0.0.1"
+    to_port: 22
+  - dst: "203.0.113.1"
+    port: 80
+    to_dst: "10.0.0.2"
+    to_port: 80

@@ -1,0 +1,37 @@
+version: 2
+ethernets:
+  enp1s0:
+    dhcp4: false
+    accept-ra: no
+    addresses:
+      - 192.168.100.7/24
+      - fc00::7/64
+    nameservers:
+      addresses:
+        - fc00::1
+        - 192.168.100.1
+      search: []
+  enp2s0:
+    dhcp4: false
+    accept-ra: no
+    addresses:
+      - fc03::1/64
+    nameservers: {}
+    routes:
+      - to: fc10::1/128
+        via: fc03::2
+  enp3s0:
+    dhcp4: false
+    accept-ra: no
+    addresses:
+      - fc04::1/64
+    nameservers: {}
+    routes:
+      - to: fc10::2/128
+        via: fc04::2
+  enp4s0:
+    dhcp4: false
+    accept-ra: no
+    addresses:
+      - fc05::1/64
+    nameservers: {}

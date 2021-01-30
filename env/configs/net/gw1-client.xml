@@ -1,0 +1,4 @@
+<network>
+  <name>gw1-client</name>
+  <domain name='gw1-client'/>
+</network>

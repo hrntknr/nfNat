@@ -1,0 +1,4 @@
+<network>
+  <name>gw2-server</name>
+  <domain name='gw2-server'/>
+</network>

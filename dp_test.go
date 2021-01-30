@@ -173,13 +173,14 @@ func TestDnat(t *testing.T) {
 		NextHeader: layers.IPProtocolIPv6Routing,
 		HopLimit:   64,
 		SrcIP:      net.ParseIP("2001:db8::1"),
-		DstIP:      net.ParseIP("2001:db8::2"),
+		DstIP:      net.ParseIP("2001:db8:0:1::"),
 	}
 	srv6 := &IPv6Routing{
 		NextHeader:   layers.IPProtocolIPv4,
 		RoutingType:  4,
-		SegmentsLeft: 0,
+		SegmentsLeft: 1,
 		SourceRoutingIPs: []net.IP{
+			net.ParseIP("2001:db8:0:2::"),
 			net.ParseIP("2001:db8:0:1::"),
 		},
 	}
@@ -207,7 +208,9 @@ func TestDnat(t *testing.T) {
 	if err := gopacket.SerializeLayers(inbuf, opts, eth, ipv6, srv6, ipv4in, tcp, payload); err != nil {
 		t.Fatal(err)
 	}
-	srv6.SegmentsLeft = 1
+	ipv6.DstIP = net.ParseIP("2001:db8:0:2::")
+	ipv6.HopLimit--
+	srv6.SegmentsLeft--
 	ipv4in.DstIP = net.IPv4(192, 168, 0, 3)
 	tcp.DstPort = 81
 	if err := gopacket.SerializeLayers(outbuf, opts, eth, ipv6, srv6, ipv4in, tcp, payload); err != nil {
@@ -232,7 +235,7 @@ func TestDnat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expect := XDP_PASS
+	expect := XDP_TX
 	if action != expect {
 		t.Fatal(fmt.Errorf("invalid action.\nexpect:%s\nactual:%s", xdp_action_string_map[expect], xdp_action_string_map[action]))
 	}

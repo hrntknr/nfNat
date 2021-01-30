@@ -1,0 +1,4 @@
+<network>
+  <name>rtr-gw2</name>
+  <domain name='rtr-gw2'/>
+</network>

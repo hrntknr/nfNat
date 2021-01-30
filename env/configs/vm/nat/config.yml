@@ -1,0 +1,19 @@
+#cloud-config
+hostname: nat
+fqdn: nat
+manage_etc_hosts: false
+users:
+  - name: ubuntu
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: users, admin
+    home: /home/ubuntu
+    shell: /bin/bash
+    lock_passwd: false
+ssh_pwauth: true
+disable_root: true
+chpasswd:
+  list: |
+    ubuntu:passwd
+  expire: false
+packages:
+  - qemu-guest-agent

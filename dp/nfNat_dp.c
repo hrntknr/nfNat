@@ -130,7 +130,7 @@ __attribute__((__always_inline__)) static inline int nat(struct xdp_md *ctx, voi
     // enable masquerade
   }
 
-  return XDP_PASS;
+  return XDP_TX;
 }
 
 __attribute__((__always_inline__)) static inline int process_srv6hdr(struct xdp_md *ctx, void *nxt_ptr, struct ethhdr *eth, struct ipv6hdr *ipv6)
@@ -144,13 +144,18 @@ __attribute__((__always_inline__)) static inline int process_srv6hdr(struct xdp_
     return XDP_PASS;
   if (srv6->segments_left > srv6->first_segment)
     return XDP_DROP;
+  if (srv6->segments_left == 0)
+    return XDP_PASS;
 
   struct in6_addr *segments = (struct in6_addr *)((void *)srv6 + 8);
 
-  assert_len(segments + srv6->first_segment + 1, data_end);
+  assert_len(segments + srv6->first_segment, data_end);
   assert_len(segments + srv6->segments_left, data_end);
   ret = nat(ctx, segments + srv6->first_segment + 1, segments + srv6->segments_left);
-  srv6->segments_left++;
+  srv6->segments_left--;
+  ipv6->hop_limit--;
+  assert_len(segments + srv6->segments_left, data_end);
+  memcpy(&ipv6->daddr, segments + srv6->segments_left, sizeof(struct in6_addr));
   return ret;
 }
 

@@ -4,13 +4,14 @@ ethernets:
     match:
       name: lo
     addresses:
-      - fc10::1/128
+      - fc14::1/64
   enp1s0:
     dhcp4: false
     accept-ra: no
     addresses:
       - 192.168.100.4/24
       - fc00::4/64
+    gateway4: 192.168.100.1
     nameservers:
       addresses:
         - fc00::1
@@ -20,13 +21,12 @@ ethernets:
     dhcp4: false
     accept-ra: no
     addresses:
-      - 192.168.1.1/24
-      - fc01::1/64
+      - fc01::4/64
     nameservers: {}
   enp3s0:
     dhcp4: false
     accept-ra: no
     addresses:
-      - fc03::2/64
-    gateway6: fc03::1
+      - 192.168.2.1/24
+      - fc02::1/64
     nameservers: {}

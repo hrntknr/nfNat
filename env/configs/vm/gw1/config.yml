@@ -17,3 +17,7 @@ chpasswd:
   expire: false
 packages:
   - qemu-guest-agent
+  - frr
+  - build-essential
+  - bison
+  - flex

@@ -1,11 +1,17 @@
 version: 2
 ethernets:
+  lo:
+    match:
+      name: lo
+    addresses:
+      - fc16::1/64
   enp1s0:
     dhcp4: false
     accept-ra: no
     addresses:
       - 192.168.100.6/24
       - fc00::6/64
+    gateway4: 192.168.100.1
     nameservers:
       addresses:
         - fc00::1
@@ -15,6 +21,5 @@ ethernets:
     dhcp4: false
     accept-ra: no
     addresses:
-      - fc05::2/64
-    gateway6: fc05::1
+      - fc01::6/64
     nameservers: {}

@@ -12,7 +12,7 @@ fi
 
 if [ ! -f $IMG_DIR/cloudimg.qcow2 ]; then
   if [ ! -f $IMG_DIR/cloudimg.img ]; then
-    wget https://cloud-images.ubuntu.com/groovy/current/groovy-server-cloudimg-amd64.img -O $IMG_DIR/cloudimg.img
+    wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img -O $IMG_DIR/cloudimg.img
   fi
   qemu-img create -b $IMG_DIR/cloudimg.img -F qcow2 -f qcow2 $IMG_DIR/cloudimg.qcow2 $DISK_SIZE
 fi
